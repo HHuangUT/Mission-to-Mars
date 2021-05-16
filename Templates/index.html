@@ -22,7 +22,7 @@
         </a></p>
       </div>
 
-      <!-- Add section for Mars News -->
+      <!-- Mars News -->
       <div class="row" id="mars-news">
         <div class="col-md-12">
           <div class="media">
@@ -33,20 +33,19 @@
             </div>
           </div>
         </div>
-      </div>
+      </div><!-- END Mars News -->
 
-      <!-- Section for Featured Image and Facts table -->
+      <!-- Featured IMG and Table -->
       <div class="row" id="mars-featured-image">
         <div class="col-md-8">
           <h2>Featured Mars Image</h2>
 
-          <!-- if images is False/None/non-existent, then default to error message -->
           <img
             src="{{mars.featured_image | default('static/images/error.png', true) }}"
             class="img-responsive"
             alt="Responsive image"
           />
-        </div>
+        </div> <!-- END Featured IMG -->
 
         <div class="col-md-4">
           <!-- Mars Facts -->
@@ -56,10 +55,10 @@
               {{ mars.facts | safe }}
             </table>
           </div>
-        </div>
-      </div>
+        </div><!-- END Mars Facts -->
+      </div> <!-- END Featured IMG and Table -->
 
-      <!-- Section for Mars Hemispheres -->
+      <!-- Hemispheres -->
       <div class="row" id="mars-hemispheres">
         <div class="page-header">
           <h2 class="text-center">Mars Hemispheres</h2>
@@ -75,7 +74,7 @@
           </div>
         </div>
         {% endfor %}
-      </div>
+      </div> <!-- END Hemispheres -->
     </div>
   </body>
 </html>

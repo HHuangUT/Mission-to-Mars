@@ -19,8 +19,8 @@ def scrape_all():
         "news_paragraph": news_paragraph,
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
-        "hemipsheres": mars_hemisphere(browser),
-        "last_modified": dt.datetime.now()
+        "last_modified": dt.datetime.now(),
+        "hemispheres": hemispheres(browser)
     }
 
     # Stop webdriver and return data
@@ -46,9 +46,9 @@ def mars_news(browser):
     try:
         slide_elem = news_soup.select_one('div.list_text')
         # Use the parent element to find the first 'a' tag and save it as 'news_title'
-        news_title = slide_elem.find('div', class_='content_title').get_text()
+        news_title = slide_elem.find("div", class_="content_title").get_text()
         # Use the parent element to find the paragraph text
-        news_p = slide_elem.find('div', class_='article_teaser_body').get_text()
+        news_p = slide_elem.find("div", class_="article_teaser_body").get_text()
 
     except AttributeError:
         return None, None
@@ -71,7 +71,7 @@ def featured_image(browser):
 
     # Add try/except for error handling
     try:
-        # Find the relative image url
+        # find the relative image url
         img_url_rel = img_soup.find('img', class_='fancybox-image').get('src')
 
     except AttributeError:
@@ -82,12 +82,13 @@ def featured_image(browser):
 
     return img_url
 
+
 def mars_facts():
     # Add try/except for error handling
     try:
         # Use 'read_html' to scrape the facts table into a dataframe
         df = pd.read_html('https://data-class-mars-facts.s3.amazonaws.com/Mars_Facts/index.html')[0]
-
+    
     except BaseException:
         return None
 
@@ -98,37 +99,56 @@ def mars_facts():
     # Convert dataframe into HTML format, add bootstrap
     return df.to_html(classes="table table-striped")
 
-def mars_hemisphere(browser):
-    url = 'https://marshemispheres.com/index.html'
-    browser.visit(url)
+
+def hemispheres(browser):
+    url = 'https://marshemispheres.com/'
+
+    browser.visit(url + 'index.html')
+
+    html = browser.html
+    img_soup = soup(html, 'html.parser')
+
+    # Click the link, find the sample anchor, return the href
     hemisphere_image_urls = []
-    thumb_html = browser.html
-    html_soup = soup(thumb_html,'html.parser')
-    items = html_soup.find_all('div', class_='item')
-    for item in items:
+
+    all_descriptions = img_soup.find_all('div', class_='description')
+
+    for i in range(4):
+        
+        # Find the elements on each loop to avoid a stale element exception
         hemispheres_dictionary = {}
 
-        href_element = item.find('a',class_='itemLink product-item')
-        href = href_element['href']
-        href = f'https://marshemispheres.com/{href}'
-        hemisphere_image_urls.append({'title':item.div.a.text,'href':href})
+        # Item link within the anchor tag
+        a_tag = all_descriptions[i].find('a', class_='itemLink product-item')
+        title = a_tag.find('h3').text
 
-    def getJPG_URL(url):
-        browser.visit(url)
-        html = browser.html
-        soup_ = soup(html,'html.parser')
-        elem = soup_.find('div',class_='downloads')
-        href = elem.find('a', target='_blank').get('href')
-        return href
+        #Finding the image by the css tag and clicking on it
+        image = browser.find_by_css('a.product-item img')   
+        image.click()
 
-    for i in range(len(hemisphere_image_urls)):
-        url = hemisphere_image_urls[i]['href']
-        jpg = getJPG_URL(url)
-        hemisphere_image_urls[i]['img_url'] = jpg
+        html_next = browser.html
+        next_page_soup = soup(html_next, 'html.parser')
+        sample_parent = next_page_soup.find('li')
+        link = sample_parent.find('a', target='_blank')['href']
+
+        image_url = url + link
+        pair ={'img_url':image_url,'title':title}
+
+        hemispheres_dictionary.update(pair)
+
+        hemisphere_image_urls.append(hemispheres_dictionary)
+
+        browser.back()
 
     return hemisphere_image_urls
 
-if __name__ == "__main__":
 
+
+if __name__ == "__main__":
+    scrape_all()
     # If running as script, print scraped data
-    print(scrape_all())
+    #print(scrape_all())
+
+
+
+

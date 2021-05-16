@@ -1,4 +1,4 @@
-DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -48,6 +48,22 @@ DOCTYPE html>
           </div>
         </div>
       </div>
+    <!-- Mars hemisphere START -->
+    <div class="row" id="mars-hemisphere">
+      <h2>Mars hemispheres</h2>
+          <div href = "#" class = "thumbnail">
+              {% for hemisphere in mars.hemispheres %}
+              <div class = "col-sm-3 col-md-6">
+                  <a href="{{hemisphere.img_url}}" class="">
+                      <img src="{{hemisphere.img_url}}" alt="{{hemisphere.title}}" class="">
+                      <div class="caption">
+                          <h4 class="">"{{hemisphere.title}}"</h4>
+                      </div>
+                  </a>
+              </div>
+              {% endfor %}
+        </div>
+    </div><!-- Mars hemisphere END -->
     </div>
   </body>
 </html>

@@ -19,6 +19,7 @@ def scrape_all():
         "news_paragraph": news_paragraph,
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
+        "hemipsheres": mars_hemisphere(browser),
         "last_modified": dt.datetime.now()
     }
 
@@ -96,6 +97,36 @@ def mars_facts():
 
     # Convert dataframe into HTML format, add bootstrap
     return df.to_html(classes="table table-striped")
+
+def mars_hemisphere(browser):
+    url = 'https://marshemispheres.com/index.html'
+    browser.visit(url)
+    hemisphere_image_urls = []
+    thumb_html = browser.html
+    html_soup = soup(thumb_html,'html.parser')
+    items = html_soup.find_all('div', class_='item')
+    for item in items:
+        hemispheres_dictionary = {}
+
+        href_element = item.find('a',class_='itemLink product-item')
+        href = href_element['href']
+        href = f'https://marshemispheres.com/{href}'
+        hemisphere_image_urls.append({'title':item.div.a.text,'href':href})
+
+    def getJPG_URL(url):
+        browser.visit(url)
+        html = browser.html
+        soup_ = soup(html,'html.parser')
+        elem = soup_.find('div',class_='downloads')
+        href = elem.find('a', target='_blank').get('href')
+        return href
+
+    for i in range(len(hemisphere_image_urls)):
+        url = hemisphere_image_urls[i]['href']
+        jpg = getJPG_URL(url)
+        hemisphere_image_urls[i]['img_url'] = jpg
+
+    return hemisphere_image_urls
 
 if __name__ == "__main__":
 
